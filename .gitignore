@@ -1,10 +1,10 @@
-# Compiled class file
+# Compiled class file #
 *.class
 
-# Log file
+# Log file #
 *.log
 
-# Maven target folder
+# Maven target folder #
 target/
 
 # Package Files #
@@ -16,5 +16,5 @@ target/
 *.tar.gz
 *.rar
 
-# vscode file
+# vscode file #
 .vscode/
