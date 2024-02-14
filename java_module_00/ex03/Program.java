@@ -34,6 +34,7 @@ public class Program {
 				System.out.println("IllegalArgument");
 				System.exit(-1);
 			}
+
 			int minGrade = 9;
 			for (int i = 0; i < 5; i++) {
 				int grade = scanner.nextInt();
@@ -44,6 +45,7 @@ public class Program {
 					minGrade = grade;
 				}
 			}
+
 			Program.storeGrade(minGrade);
 			scanner.nextLine();
 			weeksCount++;
