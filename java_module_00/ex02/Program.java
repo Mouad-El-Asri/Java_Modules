@@ -25,7 +25,7 @@ public class Program {
 	}
 
 	public static void main(String[] args) {
-		Scanner scanner = new Scanner(System.in);
+		final Scanner scanner = new Scanner(System.in);
 
 		int coffeeRequestCount = 0;
 		int sumOfDigits = 0;
