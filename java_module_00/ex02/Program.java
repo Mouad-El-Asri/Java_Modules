@@ -32,6 +32,7 @@ public class Program {
 		int query = 0;
 
 		while (query != 42) {
+			System.out.print("-> ");
 			query = scanner.nextInt();
 			scanner.nextLine();
 			sumOfDigits = sumOfDigits(query);
