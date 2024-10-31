@@ -1,17 +1,11 @@
 import java.util.Scanner;
 
 public class Program {
-	private static int minimalGrades = 0;
-
 	private static int pow(int base, int exponent) {
 		int result = 1;
 		while (exponent-- != 0)
 			result *= base;
 		return result;
-	}
-
-	private static void storeGrade(int grade) {
-		Program.minimalGrades = minimalGrades * 10 + grade;
 	}
 
 	private static void displayGrade(int grade) {
@@ -22,11 +16,15 @@ public class Program {
 
 	public static void main(String[] args) {
 		final Scanner scanner = new Scanner(System.in);
+
+		int minimalGrades = 0;
 		int weeksCount = 1;
 		int divideBy;
 		String week;
+
 		while (weeksCount <= 18) {
 			week = scanner.nextLine();
+
 			if (week.equals("42"))
 				break;
 
@@ -45,16 +43,18 @@ public class Program {
 					minGrade = grade;
 				}
 			}
-
-			Program.storeGrade(minGrade);
 			scanner.nextLine();
+			minimalGrades = minimalGrades * 10 + minGrade;
 			weeksCount++;
 		}
+
 		scanner.close();
-		divideBy = pow(10, weeksCount - 2);
+
+		divideBy = Program.pow(10, weeksCount - 2);
 		for (int i = 0; i < weeksCount - 1; i++) {
-			Program.displayGrade(Program.minimalGrades / divideBy);
-			Program.minimalGrades %= divideBy;
+			System.out.print("Week " + (i + 1) + " ");
+			Program.displayGrade(minimalGrades / divideBy);
+			minimalGrades %= divideBy;
 			divideBy /= 10;
 		}
 	}
