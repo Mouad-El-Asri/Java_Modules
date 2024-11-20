@@ -1,37 +1,36 @@
 import java.util.Scanner;
 
 public class Program {
-	private static int pow(int base, int exponent) {
+	private static int pow(int exponent) {
 		int result = 1;
 		while (exponent-- != 0)
-			result *= base;
+			result *= 10;
 		return result;
 	}
 
 	private static void displayGrade(int grade) {
+		System.out.print(' ');
 		for (int i = 0; i < grade; i++)
-			System.out.print("=");
-		System.out.println(">");
+			System.out.print('=');
+		System.out.println('>');
 	}
 
 	public static void main(String[] args) {
 		final Scanner scanner = new Scanner(System.in);
 
-		int minimalGrades = 0;
-		int weeksCount = 1;
-		int divideBy;
+		int minimalGrades = 0, weeksCount = 0, divideBy;
 		String week;
 
-		while (weeksCount <= 18) {
-			week = scanner.nextLine();
-
+		while (weeksCount < 18) {
+			week = scanner.next();
+			
 			if (week.equals("42"))
 				break;
-
-			if (!week.equals("Week " + weeksCount)) {
-				System.out.println("IllegalArgument");
+			else if (!week.equals("Week") || scanner.nextInt() != weeksCount + 1) {
+				System.err.println("IllegalArgument");
 				System.exit(-1);
 			}
+			weeksCount++;
 
 			int minGrade = 9;
 			for (int i = 0; i < 5; i++) {
@@ -45,14 +44,14 @@ public class Program {
 			}
 			scanner.nextLine();
 			minimalGrades = minimalGrades * 10 + minGrade;
-			weeksCount++;
 		}
 
 		scanner.close();
 
-		divideBy = Program.pow(10, weeksCount - 2);
-		for (int i = 0; i < weeksCount - 1; i++) {
-			System.out.print("Week " + (i + 1) + " ");
+		divideBy = Program.pow(weeksCount - 1);
+		for (int i = 0; i < weeksCount; i++) {
+			System.out.print("Week ");
+			System.out.print(i + 1);
 			Program.displayGrade(minimalGrades / divideBy);
 			minimalGrades %= divideBy;
 			divideBy /= 10;
