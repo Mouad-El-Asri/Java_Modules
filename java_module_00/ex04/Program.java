@@ -1,23 +1,9 @@
 import java.util.Scanner;
 
 public class Program {
-	public static void checkEof(char[] inputCharArr) {
-		if (!(inputCharArr.length >= 2
-			&& inputCharArr[inputCharArr.length - 2] == '4'
-			&& inputCharArr[inputCharArr.length - 1] == '2')) {
-				System.err.println("IllegalArgument");
-				System.exit(-1);
-		}
-	}
-
 	public static void countCharOccurences(char[] inputCharArr, int[] charsCountArr) {
-		for (int i = 0; i < inputCharArr.length - 2; i++) {
-			if ((inputCharArr[i] < 65 || inputCharArr[i] > 90)
-				&& (inputCharArr[i] < 97 || inputCharArr[i] > 122)) {
-					System.err.println("IllegalArgument");
-					System.exit(-1);			}
+		for (int i = 0; i < inputCharArr.length; i++) {
 			charsCountArr[inputCharArr[i]]++;
-
 			if (charsCountArr[inputCharArr[i]] > 999) {
 				System.err.println("IllegalArgument");
 				System.exit(-1);
@@ -25,22 +11,33 @@ public class Program {
 		}
 	}
 
-	public static int[] getCurrentMaxOccurence(int[] charsCountArr) {
-		int maxOccurence = 0;
-		int maxOccurenceIndex = 0;
-		for (int i = 0; i < charsCountArr.length; i++) {
-			if (charsCountArr[i] > maxOccurence) {
-				maxOccurence = charsCountArr[i];
-				maxOccurenceIndex = i;
+	public static void bubbleSort(int[] charsCountArr, int[] indexArr) {
+		int temp;
+		boolean swapped;
+		for (int i = 0; i < charsCountArr.length - 1; i++) {
+			swapped = false;
+			for (int j = 0; j < charsCountArr.length - i - 1; j++) {
+				if (charsCountArr[j] < charsCountArr[j + 1]) {
+					temp = charsCountArr[j];
+					charsCountArr[j] = charsCountArr[j + 1];
+					charsCountArr[j + 1] = temp;
+
+					temp = indexArr[j];
+					indexArr[j] = indexArr[j + 1];
+					indexArr[j + 1] = temp;
+
+					swapped = true;
+				}
 			}
+
+			if (swapped == false)
+				break;
 		}
-		charsCountArr[maxOccurenceIndex] = 0;
-		return new int[] {maxOccurence, maxOccurenceIndex};
 	}
 
 	public static int[] storeGraph(int[] arr, float scaleFactor) {
-		int symbloNumber = (int)(arr[0] / scaleFactor);
-		int spaces = 10 - symbloNumber;
+		int symbolNumber = (int)(arr[0] / scaleFactor);
+		int spaces = 10 - symbolNumber;
 		int[] charArr = new int[12];
 		for (int i = 0; i < 12; i++) {
 			if (i == spaces)
@@ -57,21 +54,28 @@ public class Program {
 
 	public static void main(String[] args) {
 		final Scanner scanner = new Scanner(System.in);
+		System.out.print("-> ");
 		final String input = scanner.nextLine();
 		System.out.println();
 		scanner.close();
 
 		final char[] inputCharArr = input.toCharArray();
-		final int[] charsCountArr = new int[127];
+		final int[] charsCountArr = new int[65535];
+		final int[] indexArr = new int[65535];
+		for (int i = 0; i < 65535; i++) {
+			indexArr[i] = i;
+		}
 
-		// Check that end of input is equal to 42
-		checkEof(inputCharArr);
-
-		// Count each character occurences
+		// Count each character occurrences
 		countCharOccurences(inputCharArr, charsCountArr);
 
+		// Sort the charsCountArr in descending order
+		bubbleSort(charsCountArr, indexArr);
+
 		// Calculate the scaling scaleFactor
-		int[] currentMaxOccurence = getCurrentMaxOccurence(charsCountArr);
+		int maxOccurenceIndex = 0;
+		int[] currentMaxOccurence = {charsCountArr[maxOccurenceIndex], indexArr[maxOccurenceIndex]};
+		maxOccurenceIndex++;
 		float scaleFactor = (float)currentMaxOccurence[0] / 10;
 
 		// Store the graph
@@ -81,7 +85,8 @@ public class Program {
 			int[] row = storeGraph(currentMaxOccurence, scaleFactor);
 			for (int j = 0; j < row.length; j++)
 				graph[i][j] = row[j];
-			currentMaxOccurence = getCurrentMaxOccurence(charsCountArr);
+			currentMaxOccurence = new int[]{charsCountArr[maxOccurenceIndex], indexArr[maxOccurenceIndex]};
+			maxOccurenceIndex++;
 			if (currentMaxOccurence[0] == 0) {
 				lastColumn = i + 1;
 				break ;
