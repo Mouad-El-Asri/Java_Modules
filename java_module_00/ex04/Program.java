@@ -35,21 +35,19 @@ public class Program {
 		}
 	}
 
-	public static int[] storeGraph(int[] arr, float scaleFactor) {
-		int symbolNumber = (int)(arr[0] / scaleFactor);
+	public static void storeGraphRow(int[] graphRow, int[] currentMaxOccurence, float scaleFactor) {
+		int symbolNumber = (int)(currentMaxOccurence[0] / scaleFactor);
 		int spaces = 10 - symbolNumber;
-		int[] charArr = new int[12];
 		for (int i = 0; i < 12; i++) {
 			if (i == spaces)
-				charArr[i] = arr[0];
+				graphRow[i] = currentMaxOccurence[0];
 			else if (i == 11)
-				charArr[i] = arr[1];
+				graphRow[i] = currentMaxOccurence[1];
 			else if (i < spaces)
-				charArr[i] = ' ';
+				graphRow[i] = ' ';
 			else
-				charArr[i] = '#';
+				graphRow[i] = '#';
 		}
-		return charArr;
 	}
 
 	public static void main(String[] args) {
@@ -82,9 +80,7 @@ public class Program {
 		int[][] graph = new int[10][12];
 		int lastColumn = 10;
 		for (int i = 0; i < 10; i++) {
-			int[] row = storeGraph(currentMaxOccurence, scaleFactor);
-			for (int j = 0; j < row.length; j++)
-				graph[i][j] = row[j];
+			storeGraphRow(graph[i], currentMaxOccurence, scaleFactor);
 			currentMaxOccurence = new int[]{charsCountArr[maxOccurenceIndex], indexArr[maxOccurenceIndex]};
 			maxOccurenceIndex++;
 			if (currentMaxOccurence[0] == 0) {
@@ -96,7 +92,7 @@ public class Program {
 		// Display the graph
 		for (int j = 0; j < 12; j++) {
 			for (int i = 0; i < lastColumn; i++) {
-				if (j != 11 && graph[i][j] != ' ' && (j == 0 || graph[i][j - 1] == ' ')) {
+				if (graph[i][j] != ' ' && (j == 0 || graph[i][j - 1] == ' ')) {
 					System.out.print(graph[i][j]);
 					if (graph[i][j] >= 10)
 						System.out.print(' ');
