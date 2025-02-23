@@ -33,6 +33,11 @@ public class Program {
 
 		while (query != 42) {
 			System.out.print("-> ");
+			if (!scanner.hasNextInt()) {
+				System.err.println("Invalid input number! Try again!");
+				scanner.next();
+				continue;
+			}
 			query = scanner.nextInt();
 			scanner.nextLine();
 			sumOfDigits = sumOfDigits(query);

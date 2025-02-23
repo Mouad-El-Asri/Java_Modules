@@ -11,21 +11,20 @@ public class Program {
 		}
 	}
 
+	public static void swap(int[] arr, int i, int j) {
+		int temp = arr[i];
+		arr[i] = arr[j];
+		arr[j] = temp;
+	}
+
 	public static void bubbleSort(int[] charsCountArr, int[] indexArr) {
-		int temp;
 		boolean swapped;
 		for (int i = 0; i < charsCountArr.length - 1; i++) {
 			swapped = false;
 			for (int j = 0; j < charsCountArr.length - i - 1; j++) {
 				if (charsCountArr[j] < charsCountArr[j + 1]) {
-					temp = charsCountArr[j];
-					charsCountArr[j] = charsCountArr[j + 1];
-					charsCountArr[j + 1] = temp;
-
-					temp = indexArr[j];
-					indexArr[j] = indexArr[j + 1];
-					indexArr[j + 1] = temp;
-
+					swap(charsCountArr, j, j + 1);
+					swap(indexArr, j, j + 1);
 					swapped = true;
 				}
 			}

@@ -19,7 +19,7 @@ public class Program {
 		final Scanner scanner = new Scanner(System.in);
 
 		int minimalGrades = 0, weeksCount = 0, divideBy;
-		String week;
+		String week = "";
 
 		while (weeksCount < 18) {
 			week = scanner.next();
@@ -34,9 +34,13 @@ public class Program {
 
 			int minGrade = 9;
 			for (int i = 0; i < 5; i++) {
+				while (!scanner.hasNextInt()) {
+					System.err.println("Grade must be a number between 1 and 9");
+					scanner.next();
+				}
 				int grade = scanner.nextInt();
 				if (grade < 1 || grade > 9) {
-					System.err.println("Grade must be between 1 and 9");
+					System.err.println("Grade must be a number between 1 and 9");
 					i--;
 				} else if (grade < minGrade) {
 					minGrade = grade;
@@ -50,7 +54,7 @@ public class Program {
 
 		divideBy = Program.pow(weeksCount - 1);
 		for (int i = 0; i < weeksCount; i++) {
-			System.out.print("Week ");
+			System.out.print("-> Week ");
 			System.out.print(i + 1);
 			Program.displayGrade(minimalGrades / divideBy);
 			minimalGrades %= divideBy;
