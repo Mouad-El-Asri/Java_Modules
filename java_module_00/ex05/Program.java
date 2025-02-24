@@ -58,6 +58,10 @@ public class Program {
 			words[j++] = word;
 			i++;
 		}
+		if (j != 4) {
+			handleError(Error.SYNTAX_ERROR);
+			return new String[]{};
+		}
 		return words;
 	}
 
