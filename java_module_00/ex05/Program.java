@@ -4,8 +4,19 @@ public class Program {
 	public static final String[] workingDays = {"MO", "TU", "WE", "TH", "FR"};
 
 	public enum AttendanceStatus {
-		HERE,
-		NOT_HERE;
+		HERE(1),
+		NOT_HERE(-1);
+
+		private final int isHere;
+
+		AttendanceStatus(int isHere) {
+			this.isHere = isHere;
+		}
+
+		@Override
+		public String toString() {
+			return this.isHere + "";
+		}
 	}
 
 	public enum Error {
@@ -14,7 +25,9 @@ public class Program {
 		CONTAINS_SPACE("Name input must not conatain spaces."),
 		INVALID_CHARCTERS("Name input must contain only letters."),
 		NOT_AN_INTEGER("Time input must be an integer."),
-		INVALID_TIME("Time input must be between 1pm and 6pm");
+		INVALID_TIME("Time input must be between 1pm and 6pm."),
+		INVALID_WORKING_DAY("Day must be a valid working day."),
+		SYNTAX_ERROR("Attendance recording statement is invalid.");
 
 		private final String errorMessage;
 
@@ -26,6 +39,41 @@ public class Program {
 		public String toString() {
 			return this.errorMessage;
 		}
+	}
+
+	public static String[] split(String s) {
+		s = trim(s);
+		char[] stringArray = s.toCharArray();
+		int i = 0;
+		int j = 0;
+		String[] words = new String[4];
+		while (i < stringArray.length) {
+			if (j == 4) {
+				handleError(Error.SYNTAX_ERROR);
+				return new String[]{};
+			}
+			String word = "";
+			while (i < stringArray.length && stringArray[i] != ' ')
+				word += stringArray[i++];
+			words[j++] = word;
+			i++;
+		}
+		return words;
+	}
+
+	public static String trim(String s) {
+		char[] stringArray = s.toCharArray();
+		String trimmedString = "";
+
+		int j = stringArray.length - 1;
+		while (j > 0 && (stringArray[j] == 32 || (stringArray[j] >= 9 && stringArray[j] <= 13)))
+			j--;
+		int i = 0;
+		while (j > 0 && (stringArray[i] == 32 || (stringArray[i] >= 9 && stringArray[i] <= 13)))
+			i++;
+		while (i <= j)
+			trimmedString +=  stringArray[i++];
+		return trimmedString;
 	}
 
 	public static boolean handleError(Error err) {
@@ -77,10 +125,11 @@ public class Program {
 		}
 		day = scanner.nextLine();
 		scanner.close();
-		for (String workingDay : workingDays)
-			if (day == workingDay)
+		for (String workingDay : workingDays) {
+			if (trim(day).equals(workingDay))
 				return true;
-		return false;
+		}
+		return handleError(Error.INVALID_WORKING_DAY);
 	}
 
 	public static void main(String[] args) {
@@ -101,14 +150,21 @@ public class Program {
 						isValidInput = parseClass(input);
 						break;
 					default:
-						isValidInput = false;
-						break;
+						isValidInput = true;
+						String[] attendanceRecording = split(input);
+						if (attendanceRecording.length == 0)
+							isValidInput = false;
 				}
-				if (isValidInput)
+				if (isValidInput) {
 					schoolData[i][j++] = input;
+					isValidInput = false;
+					if (j == 10) {
+						System.out.println("-> .");
+						break;
+					}
+				}
 				System.out.print("-> ");
 				input = scanner.nextLine();
-				isValidInput = false;
 			}
 		}
 		scanner.close();
