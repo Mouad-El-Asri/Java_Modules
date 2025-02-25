@@ -1,25 +1,19 @@
 import java.util.Scanner;
 
 public class Program {
-	public static final String[] workingDays = {"MO", "TU", "WE", "TH", "FR"};
+	private static String[] students = new String[10];
+	private static int[][] classesSchedule = new int[5][6];
+	private static final String[] weekDays = {"MO", "TU", "WE", "TH", "FR"};
+	private static final int[] classDays = {1, 2, 3, 4, 7, 8, 9, 10, 11, 14, 15, 16, 17, 18, 21, 22, 23, 24, 25, 28, 29, 30};
 
-	public enum AttendanceStatus {
-		HERE(1),
-		NOT_HERE(-1);
-
-		private final int isHere;
-
-		AttendanceStatus(int isHere) {
-			this.isHere = isHere;
-		}
-
-		@Override
-		public String toString() {
-			return this.isHere + "";
-		}
+	public static int getDayIndex(int day) {
+		for (int i = 0; i < classDays.length; i++)
+			if (classDays[i] == day)
+				return ((i + 1) % 5);
+		return -1;
 	}
 
-	public enum Error {
+	private enum Error {
 		EMPTY_NAME("Name input cannot be empty."),
 		TOO_LONG("Name input must be max 10 characters."),
 		CONTAINS_SPACE("Name input must not conatain spaces."),
@@ -27,7 +21,10 @@ public class Program {
 		NOT_AN_INTEGER("Time input must be an integer."),
 		INVALID_TIME("Time input must be between 1pm and 6pm."),
 		INVALID_WORKING_DAY("Day must be a valid working day."),
-		SYNTAX_ERROR("Attendance recording statement is invalid.");
+		SYNTAX_ERROR("Attendance recording statement is invalid."),
+		CLASS_ALREADY_EXIST("Class already exists."),
+		DAY_NOT_FOUND("Day not found."),
+		NAME_NOT_FOUND("Student name not found.");
 
 		private final String errorMessage;
 
@@ -41,31 +38,14 @@ public class Program {
 		}
 	}
 
-	public static String[] split(String s) {
-		s = trim(s);
-		char[] stringArray = s.toCharArray();
-		int i = 0;
-		int j = 0;
-		String[] words = new String[4];
-		while (i < stringArray.length) {
-			if (j == 4) {
-				handleError(Error.SYNTAX_ERROR);
-				return new String[]{};
-			}
-			String word = "";
-			while (i < stringArray.length && stringArray[i] != ' ')
-				word += stringArray[i++];
-			words[j++] = word;
-			i++;
-		}
-		if (j != 4) {
-			handleError(Error.SYNTAX_ERROR);
-			return new String[]{};
-		}
-		return words;
+	private static boolean contains(String[] array, String toFind) {
+		for (String s : array)
+			if (s != null && s.equals(toFind))
+				return true;
+		return false;
 	}
 
-	public static String trim(String s) {
+	private static String trim(String s) {
 		char[] stringArray = s.toCharArray();
 		String trimmedString = "";
 
@@ -80,12 +60,12 @@ public class Program {
 		return trimmedString;
 	}
 
-	public static boolean handleError(Error err) {
+	private static boolean handleError(Error err) {
 		System.err.println("Error: " + err);
 		return false;
 	}
 
-	public static boolean isAlpha(char[] chars) {
+	private static boolean isAlpha(char[] chars) {
 		for (char c : chars) {
 			if ((c < 65 || c > 90) &&
 				(c < 97 || c > 122))
@@ -94,14 +74,14 @@ public class Program {
 		return true;
 	}
 
-	public static boolean containsSpace(char[] chars) {
+	private static boolean containsSpace(char[] chars) {
 		for (char c : chars)
 			if (c == ' ')
 				return true;
 		return false;
 	}
 
-	public static boolean parseName(String name) {
+	private static boolean parseName(String name) {
 		char[] nameChars = name.toCharArray();
 		if (nameChars.length == 0)
 			return handleError(Error.EMPTY_NAME);
@@ -114,7 +94,14 @@ public class Program {
 		return true;
 	}
 
-	public static boolean parseClass(String input) {
+	private static int getIndex(String[] array, String value) {
+		for (int i = 0; i < array.length; i++)
+			if (array[i].equals(value))
+				return i;
+		return -1;
+	}
+
+	private static boolean parseClass(String input) {
 		int time;
 		String day;
 		final Scanner scanner = new Scanner(input);
@@ -127,20 +114,65 @@ public class Program {
 			scanner.close();
 			return handleError(Error.INVALID_TIME);
 		}
-		day = scanner.nextLine();
+		day = trim(scanner.nextLine());
 		scanner.close();
-		for (String workingDay : workingDays) {
-			if (trim(day).equals(workingDay))
+		for (String weekDay : weekDays) {
+			if (day.equals(weekDay)) {
+				if (classesSchedule[getIndex(weekDays, day)][time - 1] == 1)
+					return handleError(Error.CLASS_ALREADY_EXIST);
+				classesSchedule[getIndex(weekDays, day)][time - 1] = 1;
 				return true;
+			}
 		}
 		return handleError(Error.INVALID_WORKING_DAY);
 	}
 
+	private static boolean parseAttendanceRecording(String input) {
+		// Split the statement
+		input = trim(input);
+		char[] stringArray = input.toCharArray();
+		int i = 0;
+		int j = 0;
+		String[] inputWords = new String[4];
+		while (i < stringArray.length) {
+			if (j == 4)
+				return handleError(Error.SYNTAX_ERROR);
+			String word = "";
+			while (i < stringArray.length && stringArray[i] != ' ')
+				word += stringArray[i++];
+			inputWords[j++] = word;
+			i++;
+		}
+		if (j != 4)
+			return handleError(Error.SYNTAX_ERROR);
+
+		// Parse the statement
+		if (!contains(students, inputWords[0]))
+			return handleError(Error.NAME_NOT_FOUND);
+		final Scanner scanner1 = new Scanner(inputWords[1]);
+		if (!scanner1.hasNextInt()) {
+			scanner1.close();
+			return handleError(Error.NOT_AN_INTEGER);
+		}
+		int classTime = scanner1.nextInt();
+		scanner1.close();
+
+		final Scanner scanner2 = new Scanner(inputWords[2]);
+		if (!scanner2.hasNextInt()) {
+			scanner2.close();
+			return handleError(Error.NOT_AN_INTEGER);
+		}
+		int classDay = scanner2.nextInt();
+		scanner2.close();
+
+		if (getDayIndex(classDay) == -1)
+			return handleError(Error.DAY_NOT_FOUND);;
+		return true;
+	}
+
 	public static void main(String[] args) {
 		final Scanner scanner = new Scanner(System.in);
-		String[][] schoolData = new String[3][10];
 		int j;
-		boolean isValidInput;
 		for (int i = 0; i < 3; i++) {
 			j = 0;
 			System.out.print("-> ");
@@ -148,24 +180,18 @@ public class Program {
 			while (!input.equals(".")) {
 				switch (i) {
 					case 0:
-						isValidInput = parseName(input);
+						if (parseName(input))
+							students[j++] = input;
 						break;
 					case 1:
-						isValidInput = parseClass(input);
+						parseClass(input);
 						break;
 					default:
-						isValidInput = true;
-						String[] attendanceRecording = split(input);
-						if (attendanceRecording.length == 0)
-							isValidInput = false;
+						parseAttendanceRecording(input);
 				}
-				if (isValidInput) {
-					schoolData[i][j++] = input;
-					isValidInput = false;
-					if (j == 10) {
-						System.out.println("-> .");
-						break;
-					}
+				if (j == 10) {
+					System.out.println("-> .");
+					break;
 				}
 				System.out.print("-> ");
 				input = scanner.nextLine();
