@@ -6,13 +6,6 @@ public class Program {
 	private static final String[] weekDays = {"MO", "TU", "WE", "TH", "FR"};
 	private static final int[] classDays = {1, 2, 3, 4, 7, 8, 9, 10, 11, 14, 15, 16, 17, 18, 21, 22, 23, 24, 25, 28, 29, 30};
 
-	public static int getDayIndex(int day) {
-		for (int i = 0; i < classDays.length; i++)
-			if (classDays[i] == day)
-				return ((i + 1) % 5);
-		return -1;
-	}
-
 	private enum Error {
 		EMPTY_NAME("Name input cannot be empty."),
 		TOO_LONG("Name input must be max 10 characters."),
@@ -21,8 +14,10 @@ public class Program {
 		NOT_AN_INTEGER("Time input must be an integer."),
 		INVALID_TIME("Time input must be between 1pm and 6pm."),
 		INVALID_WORKING_DAY("Day must be a valid working day."),
-		SYNTAX_ERROR("Attendance recording statement is invalid."),
+		SYNTAX_ERROR("Invalid statement."),
+		NAME_ALREADY_EXIST("Name already exists."),
 		CLASS_ALREADY_EXIST("Class already exists."),
+		CLASS_NOT_FOUND("Class not found."),
 		DAY_NOT_FOUND("Day not found."),
 		NAME_NOT_FOUND("Student name not found.");
 
@@ -36,6 +31,13 @@ public class Program {
 		public String toString() {
 			return this.errorMessage;
 		}
+	}
+
+	public static int getDayIndex(int day) {
+		for (int i = 0; i < classDays.length; i++)
+			if (classDays[i] == day)
+				return ((i + 1) % 5);
+		return -1;
 	}
 
 	private static boolean contains(String[] array, String toFind) {
@@ -83,6 +85,8 @@ public class Program {
 
 	private static boolean parseName(String name) {
 		char[] nameChars = name.toCharArray();
+		if (contains(students, name))
+			return handleError(Error.NAME_ALREADY_EXIST);
 		if (nameChars.length == 0)
 			return handleError(Error.EMPTY_NAME);
 		if (nameChars.length > 10)
@@ -149,6 +153,12 @@ public class Program {
 		// Parse the statement
 		if (!contains(students, inputWords[0]))
 			return handleError(Error.NAME_NOT_FOUND);
+
+		if (!inputWords[3].equals("HERE") &&
+			!inputWords[3].equals("NOT_HERE"))
+			return handleError(Error.SYNTAX_ERROR);
+
+
 		final Scanner scanner1 = new Scanner(inputWords[1]);
 		if (!scanner1.hasNextInt()) {
 			scanner1.close();
@@ -156,6 +166,9 @@ public class Program {
 		}
 		int classTime = scanner1.nextInt();
 		scanner1.close();
+
+		if (classTime < 1 || classTime > 6)
+			return handleError(Error.INVALID_TIME);
 
 		final Scanner scanner2 = new Scanner(inputWords[2]);
 		if (!scanner2.hasNextInt()) {
@@ -165,8 +178,11 @@ public class Program {
 		int classDay = scanner2.nextInt();
 		scanner2.close();
 
-		if (getDayIndex(classDay) == -1)
-			return handleError(Error.DAY_NOT_FOUND);;
+		int dayIndex = getDayIndex(classDay);
+		if (dayIndex == -1)
+			return handleError(Error.DAY_NOT_FOUND);
+		if (classesSchedule[dayIndex][classTime - 1] != 1)
+			return handleError(Error.CLASS_NOT_FOUND);
 		return true;
 	}
 
@@ -180,8 +196,9 @@ public class Program {
 			while (!input.equals(".")) {
 				switch (i) {
 					case 0:
+						input = trim(input);
 						if (parseName(input))
-							students[j++] = input;
+							students[j] = input;
 						break;
 					case 1:
 						parseClass(input);
@@ -189,7 +206,7 @@ public class Program {
 					default:
 						parseAttendanceRecording(input);
 				}
-				if (j == 10) {
+				if (++j == 10) {
 					System.out.println("-> .");
 					break;
 				}
@@ -197,6 +214,25 @@ public class Program {
 				input = scanner.nextLine();
 			}
 		}
+		// for (int i = 0; i < 5; i++) {
+		// 	for (int k = 0; k < 6; k++) {
+		// 		if (classesSchedule[i][k] == 1)
+		// 			System.out.println(k + 1 + ":00");
+		// 			// System.out.print("|");
+		// 	}
+		// }
+		for (int i = 0; i < classDays.length; i++) {
+			for (int k = 0; k < 6; k++) {
+				if (classesSchedule[(i + 1) % 5][k] == 1) {
+					System.out.print("  ");
+					System.out.print(k + 1 + ":00 ");
+					System.out.print(weekDays[(i + 1) % 5] + " ");
+					System.out.print(classDays[i]);
+					System.out.print(" |");
+				}
+			}
+		}
+		System.out.println();
 		scanner.close();
 	}
 }
