@@ -7,6 +7,10 @@ public class Program {
     private static final int[][] classesSchedule = new int[5][6];
     private static final String[] weekDays = {"MO", "TU", "WE", "TH", "FR"};
     private static final int[] classDays = {1, 2, 3, 4, 7, 8, 9, 10, 11, 14, 15, 16, 17, 18, 21, 22, 23, 24, 25, 28, 29, 30};
+    private static final String[] attendanceRecords = new String[10];
+    private static int attendanceRecordsIndex = 0;
+	private static final String[] classSchedules = new String[10];
+    private static int classSchedulesIndex = 0;
 
     private enum Error {
         EMPTY_NAME("Name input cannot be empty."),
@@ -174,7 +178,8 @@ public class Program {
         }
 
         // Parse the statement
-        if (!contains(students, inputWords[0])) {
+        String studentName = inputWords[0];
+        if (!contains(students, studentName)) {
             return handleError(Error.NAME_NOT_FOUND);
         }
 
@@ -210,7 +215,22 @@ public class Program {
         if (classesSchedule[dayIndex][classTime - 1] != 1) {
             return handleError(Error.CLASS_NOT_FOUND);
         }
+        attendanceRecords[attendanceRecordsIndex++] = input;
         return true;
+    }
+
+    private static boolean attendanceRecorded(String studentName, int index) {
+        for (int d = 0; d < 10; d++) {
+            if ((studentName + classSchedules[index] + " HERE").equals(attendanceRecords[d])) {
+                System.out.print("      1     |");
+                return true;
+            } else if ((studentName + classSchedules[index] + " NOT_HERE").equals(attendanceRecords[d])) {
+                System.out.print("     -1     |");
+                return true;
+            }
+        }
+		System.out.print("            |");
+		return false;
     }
 
     public static void main(String[] args) {
@@ -228,8 +248,10 @@ public class Program {
                             students[j] = input;
                         }
                     }
-                    case 1 -> parseClass(input);
-                    default -> parseAttendanceRecording(input);
+                    case 1 ->
+                        parseClass(input);
+                    default ->
+                        parseAttendanceRecording(input);
                 }
                 if (++j == 10) {
                     System.out.println("-> .");
@@ -248,6 +270,7 @@ public class Program {
                 if (classesSchedule[(i + 1) % 5][k] == 1) {
                     System.out.print(" ");
                     System.out.print(k + 1 + ":00 ");
+                    classSchedules[classSchedulesIndex++] = " " + (k + 1) + " " + classDays[i];
                     System.out.print(weekDays[(i + 1) % 5] + " ");
                     System.out.print(classDays[i] > 9 ? classDays[i] : "0" + classDays[i]);
                     System.out.print(" |");
@@ -268,7 +291,7 @@ public class Program {
                     }
                     System.out.print("|");
                 } else {
-                    System.out.print("            |");
+                    attendanceRecorded(students[i], l - 1);
                 }
             }
             System.out.println();
