@@ -17,7 +17,7 @@ public class UsersArrayList implements UsersList {
 
 
 	@Override
-	public User getUserById(int id) {
+	public User getUserById(Integer id) {
 		for (User user : this.usersList) {
 			if (user.getUserId() == id)
 				return user;
@@ -26,12 +26,12 @@ public class UsersArrayList implements UsersList {
 	}
 
 	@Override
-	public User getUserByIndex(int i) {
+	public User getUserByIndex(Integer i) {
 		return this.usersList.get(i);
 	}
 
 	@Override
-	public int getUsersCount() {
+	public Integer getUsersCount() {
 		return this.usersList.size();
 	}
 
