@@ -2,7 +2,6 @@ public class Program {
 	public static void main(String[] args) {
 		User user_1 = new User("Amine", 4087);
 		User user_2 = new User("Mouad", 0);
-		user_2.setBalance(2032);
 		User user_3 = new User("Anass", 7000);
 
 		UsersArrayList usersList = new UsersArrayList();

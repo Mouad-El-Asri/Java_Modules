@@ -17,7 +17,7 @@ public class UsersArrayList implements UsersList {
 
 
 	@Override
-	public User getUserById(Integer id) {
+	public User getUserById(Integer id) throws UserNotFoundException {
 		for (User user : this.usersList) {
 			if (user.getUserId() == id)
 				return user;
